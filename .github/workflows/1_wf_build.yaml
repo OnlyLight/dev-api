@@ -29,21 +29,16 @@ jobs:
 
       - name: Build Docker Image
         run: |
-          docker build -f api/Dockerfile \
-            -t ${{ vars.DOCKER_USERNAME }}/crawler-api:${{ env.IMAGE_TAG }} \
-            .
+          docker build -t ${{ vars.DOCKER_USERNAME }}/crawler-api:${{ env.IMAGE_TAG }} ./api
 
-          docker build -f consumer/Dockerfile \
-            -t ${{ vars.DOCKER_USERNAME }}/consumer-app:${{ env.IMAGE_TAG }} \
-            .
+          # docker build -f consumer/Dockerfile \
+          #   -t ${{ vars.DOCKER_USERNAME }}/consumer-app:${{ env.IMAGE_TAG }} .
 
-          docker build -f crawler/Dockerfile \
-            -t ${{ vars.DOCKER_USERNAME }}/crawler-app:${{ env.IMAGE_TAG }} \
-            .
+          # docker build -f crawler/Dockerfile \
+          #   -t ${{ vars.DOCKER_USERNAME }}/crawler-app:${{ env.IMAGE_TAG }} .
 
-          docker build -f migrate/Dockerfile \
-            -t ${{ vars.DOCKER_USERNAME }}/crawler-app-migrate:${{ env.IMAGE_TAG }} \
-            .
+          # docker build -f migrate/Dockerfile \
+          #   -t ${{ vars.DOCKER_USERNAME }}/crawler-app-migrate:${{ env.IMAGE_TAG }} .
       
       - name: Push Docker Image
         run: |
