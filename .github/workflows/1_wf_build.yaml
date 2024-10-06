@@ -1,0 +1,55 @@
+name: wf_be_build
+
+on:
+  push:
+    branches: ["main"]
+    # paths:
+    #   - "api/**"
+    #   - "consumer/**"
+    #   - "crawler/**"
+    #   - "migrate/**"
+
+jobs:
+  build:
+    name: Build Image BE
+    runs-on: ubuntu-22.04
+    timeout-minutes: 20
+    env:
+      IMAGE_TAG: $(git rev-parse --short HEAD)
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Login to Dockerhub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ vars.DOCKER_URL }}
+          username: ${{ vars.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Build Docker Image
+        run: |
+          docker build -f api/Dockerfile \
+            -t ${{ vars.DOCKER_USERNAME }}/crawler-api:${{ env.IMAGE_TAG }} \
+            .
+
+          docker build -f consumer/Dockerfile \
+            -t ${{ vars.DOCKER_USERNAME }}/consumer-app:${{ env.IMAGE_TAG }} \
+            .
+
+          docker build -f crawler/Dockerfile \
+            -t ${{ vars.DOCKER_USERNAME }}/crawler-app:${{ env.IMAGE_TAG }} \
+            .
+
+          docker build -f migrate/Dockerfile \
+            -t ${{ vars.DOCKER_USERNAME }}/crawler-app-migrate:${{ env.IMAGE_TAG }} \
+            .
+      
+      - name: Push Docker Image
+        run: |
+          docker push ${{ vars.DOCKER_USERNAME }}/crawler-api:${{ env.IMAGE_TAG }}
+          docker push ${{ vars.DOCKER_USERNAME }}/consumer-app:${{ env.IMAGE_TAG }}
+          docker push ${{ vars.DOCKER_USERNAME }}/crawler-app:${{ env.IMAGE_TAG }}
+          docker push ${{ vars.DOCKER_USERNAME }}/crawler-app-migrate:${{ env.IMAGE_TAG }}
