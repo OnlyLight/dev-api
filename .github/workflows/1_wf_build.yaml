@@ -27,6 +27,13 @@ jobs:
           username: ${{ vars.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
 
+      - name: Overwrite environment build variables
+        run: |
+          cat ./api/.env.container > ./api/.env
+          cat ./consumer/.env.container > ./consumer/.env
+          cat ./crawler/.env.container > ./crawler/.env
+          cat ./migrate/.env.container > ./migrate/.env
+
       - name: Build Docker Image
         run: |
           docker build -t ${{ vars.DOCKER_USERNAME }}/crawler-api:${{ env.IMAGE_TAG }} ./api
