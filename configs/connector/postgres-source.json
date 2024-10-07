@@ -7,7 +7,7 @@
     "database.port": "5432",
     "database.user": "crawler",
     "database.dbname": "crawler",
-    "database.password": "200lab",
+    "database.password": "asdasd123",
     "topic.prefix": "crawler",
     "table.include.list": "public.posts",
     "transforms": "rename",

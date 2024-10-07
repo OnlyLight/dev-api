@@ -39,7 +39,14 @@ jobs:
       
       - name: Push Docker Image
         run: |
+          docker push ${{ vars.DOCKER_USERNAME }}/crawler-api:latest
           docker push ${{ vars.DOCKER_USERNAME }}/crawler-api:${{ env.IMAGE_TAG }}
+
+          docker push ${{ vars.DOCKER_USERNAME }}/consumer-app:latest
           docker push ${{ vars.DOCKER_USERNAME }}/consumer-app:${{ env.IMAGE_TAG }}
+
+          docker push ${{ vars.DOCKER_USERNAME }}/crawler-app:latest
           docker push ${{ vars.DOCKER_USERNAME }}/crawler-app:${{ env.IMAGE_TAG }}
+
+          docker push ${{ vars.DOCKER_USERNAME }}/crawler-app-migrate:latest
           docker push ${{ vars.DOCKER_USERNAME }}/crawler-app-migrate:${{ env.IMAGE_TAG }}
