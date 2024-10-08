@@ -1,32 +1,6 @@
 version: "3.8"
 
 services:
-  crawler:
-    container_name: crawler-app
-    build:
-      context: crawler
-    env_file:
-      - crawler/.env.container
-    networks:
-      - crawler
-  consumer:
-    container_name: consumer-app
-    build:
-      context: consumer
-    env_file:
-      - consumer/.env.container
-    networks:
-      - crawler
-  api:
-    container_name: crawler-api
-    build:
-      context: api
-    env_file:
-      - api/.env.container
-    ports:
-      - "3000:3000"
-    networks:
-      - crawler
   postgres:
     image: postgres:14
     container_name: postgres
@@ -47,6 +21,7 @@ services:
     restart: unless-stopped
     networks:
       - crawler
+
   redis:
     image: redis/redis-stack:6.2.6-v11
     container_name: redis
@@ -56,6 +31,71 @@ services:
       - 6379:6379
     networks:
       - crawler
+
+  crawler:
+    container_name: crawler-app
+    build:
+      context: crawler
+    env_file:
+      - crawler/.env.container
+    depends_on:
+      - postgres
+      - redis
+    networks:
+      - crawler
+
+  migrate-init:
+    container_name: crawler-app-migrate-init
+    build:
+      context: migrate
+    env_file:
+      - migrate/.env.container
+    command: ["/app/run", "init"]
+    restart: "on-failure"
+    depends_on:
+      - postgres
+    networks:
+      - crawler
+
+  migrate:
+    container_name: crawler-app-migrate
+    build:
+      context: migrate
+    env_file:
+      - migrate/.env.container
+    command: ["/app/run", "migrate"]
+    restart: "on-failure"
+    depends_on:
+      - postgres
+      - migrate-init
+    networks:
+      - crawler
+
+  consumer:
+    container_name: consumer-app
+    build:
+      context: consumer
+    env_file:
+      - consumer/.env.container
+    depends_on:
+      - migrate
+      - crawler
+    networks:
+      - crawler
+
+  api:
+    container_name: crawler-api
+    build:
+      context: api
+    env_file:
+      - api/.env.container
+    depends_on:
+      - consumer
+    ports:
+      - "3000:3000"
+    networks:
+      - crawler
+
   elasticsearch:
     image: docker.elastic.co/elasticsearch/elasticsearch:8.12.0
     container_name: elasticsearch
@@ -85,6 +125,8 @@ services:
       KAFKA_INTER_BROKER_LISTENER_NAME: 'PLAINTEXT'
       KAFKA_CONTROLLER_LISTENER_NAMES: 'CONTROLLER'
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+    depends_on:
+      - consumer
     networks:
       - crawler
   kafka-connect:
