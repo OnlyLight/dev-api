@@ -1,7 +1,5 @@
 extern crate pretty_env_logger;
 
-mod telemetry;
-
 use dotenv::dotenv;
 use elasticsearch::{http::transport::Transport, Elasticsearch, SearchParts};
 use serde::{Deserialize, Serialize};
@@ -86,7 +84,6 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     }
 
     dotenv().ok();
-    telemetry::init_tracer();
 
     let pool: sqlx::Pool<sqlx::Postgres> = PgPoolOptions::new()
         .max_connections(5)
