@@ -42,40 +42,6 @@ async fn get_posts(pool: PgPool) -> Result<impl Reply, Rejection> {
     }
 }
 
-async fn search_posts(query: SearchQuery, es: Elasticsearch) -> Result<impl Reply, Rejection> {
-    let response = es
-        .search(SearchParts::Index(&["crawler-posts"]))
-        .body(json!({
-            "query": {
-                "query_string": query
-            }
-        }))
-        .send()
-        .await
-        .map_err(|error| {
-            eprintln!("Elasticsearch request failed: {}", error);
-            warp::reject::reject()
-        })?;
-
-    let body = response.json::<Value>().await.map_err(|error| {
-        eprintln!("Failed to parse Elasticsearch response: {}", error);
-        warp::reject()
-    })?;
-
-    let mut v = Vec::new();
-    for hit in body["hits"]["hits"].as_array().unwrap() {
-        let id = hit["_source"]["after"]["id"].clone();
-
-        if v.contains(&id) {
-            continue;
-        }
-
-        v.push(id);
-    }
-
-    Ok(warp::reply::json(&v))
-}
-
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
     if env::var_os("RUST_LOG").is_none() {
@@ -98,13 +64,6 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         .and(with_db(pool.clone()))
         .and_then(get_posts);
 
-    let search_posts = warp::post()
-        .and(warp::path("posts"))
-        .and(warp::path("search"))
-        .and(json_body())
-        .and(with_es(client.clone()))
-        .and_then(search_posts);
-
     let options_route = warp::options().map(warp::reply);
 
     let cors = warp::cors()
@@ -113,7 +72,6 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         .allow_headers(vec!["Content-Type"]);
 
     let routes = get_posts
-        .or(search_posts)
         .or(options_route)
         .with(cors)
         .with(warp::log("posts"));
