@@ -82,13 +82,3 @@ fn with_db(
 ) -> impl Filter<Extract = (PgPool,), Error = std::convert::Infallible> + Clone {
     warp::any().map(move || pool.clone())
 }
-
-fn with_es(
-    es: Elasticsearch,
-) -> impl Filter<Extract = (Elasticsearch,), Error = std::convert::Infallible> + Clone {
-    warp::any().map(move || es.clone())
-}
-
-fn json_body() -> impl Filter<Extract = (SearchQuery,), Error = warp::Rejection> + Clone {
-    warp::body::content_length_limit(1024 * 16).and(warp::body::json())
-}

@@ -12,7 +12,7 @@ RUN mkdir src \
   && cargo build --release
 
 COPY . .
-RUN cargo build --release
+RUN cargo build --locked --release
 RUN cp ./target/release/$APP_NAME /bin/server
 
 FROM debian:bullseye-slim AS final
