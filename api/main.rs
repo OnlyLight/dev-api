@@ -1,7 +1,6 @@
 extern crate pretty_env_logger;
 
 use dotenv::dotenv;
-use elasticsearch::{http::transport::Transport, Elasticsearch, SearchParts};
 use serde::{Deserialize, Serialize};
 use serde_json::{json, Value};
 use sqlx::postgres::{PgPool, PgPoolOptions};
@@ -55,9 +54,6 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         .max_connections(5)
         .connect(&env::var("POSTGRES_DNS").unwrap())
         .await?;
-
-    let transport = Transport::single_node(&env::var("ELASTICSEARCH_DNS").unwrap())?;
-    let client = Elasticsearch::new(transport);
 
     let get_posts = warp::get()
         .and(warp::path("posts"))
