@@ -5,7 +5,7 @@ ARG APP_NAME=api
 RUN apt update && apt install pkg-config libssl-dev -y
 WORKDIR /build
 
-COPY Cargo.* ./
+COPY Cargo.lock Cargo.toml ./
 RUN sed -i 's/path = "main.rs"/path = "src\/lib.rs"/g' Cargo.toml
 RUN mkdir src \
   && echo "fn main() {}" > src/lib.rs \
