@@ -110,7 +110,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let cors = warp::cors()
         .allow_any_origin()
         .allow_methods(vec!["GET", "POST", "OPTIONS"])
-        .allow_headers(vec!["Content-Type"]);
+        .allow_headers(vec!["Content-Type", "Access-Control-Allow-Origin"]);
 
     let routes = get_posts
         .or(search_posts)
@@ -136,12 +136,6 @@ fn with_es(
 }
 
 fn json_body() -> impl Filter<Extract = (SearchQuery,), Error = warp::Rejection> + Clone {
-    // Define the filter to extract JSON body with a content length limit
-    warp::body::content_length_limit(1024 * 16) // Limit to 16 KB
-        .and(warp::body::json())
-        .map(|body: SearchQuery| {
-            // Log the received body for debugging purposes
-            println!("Received body: {:?}", body);
-            body // Return the parsed JSON body as `SearchQuery`
-        })
+    warp::body::content_length_limit(1024 * 16).and(warp::body::json())
+    println!("Received body: {:?}", body);
 }
