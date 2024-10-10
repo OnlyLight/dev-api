@@ -105,7 +105,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         .and(with_es(client.clone()))
         .and_then(search_posts);
 
-    let options_route = warp::options().map(|| warp::reply::with_status("", StatusCode::OK));
+    let options_route = warp::options().map(warp::reply);
 
     let cors = warp::cors()
         .allow_any_origin()
