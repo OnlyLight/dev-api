@@ -101,7 +101,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let search_posts = warp::post()
         .and(warp::path("posts"))
         .and(warp::path("search"))
-        .and(warp::body::json())
+        .and(json_body())
         .and(with_es(client.clone()))
         .and_then(search_posts);
 
@@ -136,5 +136,12 @@ fn with_es(
 }
 
 fn json_body() -> impl Filter<Extract = (SearchQuery,), Error = warp::Rejection> + Clone {
-    warp::body::content_length_limit(1024 * 16).and(warp::body::json())
+    // Define the filter to extract JSON body with a content length limit
+    warp::body::content_length_limit(1024 * 16) // Limit to 16 KB
+        .and(warp::body::json())
+        .map(|body: SearchQuery| {
+            // Log the received body for debugging purposes
+            println!("Received body: {:?}", body);
+            body // Return the parsed JSON body as `SearchQuery`
+        })
 }
