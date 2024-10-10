@@ -137,5 +137,4 @@ fn with_es(
 
 fn json_body() -> impl Filter<Extract = (SearchQuery,), Error = warp::Rejection> + Clone {
     warp::body::content_length_limit(1024 * 16).and(warp::body::json())
-    println!("Received body: {:?}", body);
 }
