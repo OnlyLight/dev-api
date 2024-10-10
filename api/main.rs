@@ -101,7 +101,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let search_posts = warp::post()
         .and(warp::path("posts"))
         .and(warp::path("search"))
-        .and(json_body())
+        .and(warp::body::json())
         .and(with_es(client.clone()))
         .and_then(search_posts);
 
