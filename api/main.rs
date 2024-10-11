@@ -108,7 +108,6 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let options_route = warp::options().map(warp::reply);
 
     let cors = warp::cors()
-        .allow_credentials(true)
         .allow_any_origin()
         .allow_methods(vec!["GET", "POST", "OPTIONS"])
         .allow_headers(vec!["Content-Type"]);
