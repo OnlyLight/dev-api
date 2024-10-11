@@ -110,7 +110,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let cors = warp::cors()
         .allow_any_origin()
         .allow_methods(vec!["GET", "POST", "OPTIONS"])
-        .allow_any_header(vec!["Content-Type"]);
+        .allow_headers(vec!["Content-Type"]);
 
     let routes = get_posts
         .or(search_posts)
