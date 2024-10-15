@@ -7,10 +7,10 @@ on:
   push:
     branches: ["main"]
     paths:
-      - "api/**"
-      - "consumer/**"
-      - "crawler/**"
-      - "migrate/**"
+      - "crawler-api/**"
+      - "consumer-app/**"
+      - "crawler-app/**"
+      - "crawler-app-migrate/**"
 
 jobs:
   scan-changed-folders:
