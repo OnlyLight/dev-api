@@ -1,4 +1,4 @@
-name: wf_be_build
+name: auto_build
 
 env:
   PATH_SERVICES_BE: "crawler-api, consumer-app, crawler-app, crawler-app-migrate"
