@@ -1,17 +1,24 @@
 name: wf_be_build
 
 on:
-  push:
-    branches: ["main"]
-    # paths:
-    #   - "api/**"
-    #   - "consumer/**"
-    #   - "crawler/**"
-    #   - "migrate/**"
+  workflow_call:
+    inputs:
+      APP_NAME:
+        required: true
+        type: string
+      DOCKER_URL:
+        required: true
+        type: string
+      DOCKER_USERNAME:
+        required: true
+        type: string
+    secrets:
+      DOCKER_PASSWORD:
+        required: true
 
 jobs:
   build:
-    name: Build Image BE
+    name: Build ${{ inputs.APP_NAME }}
     runs-on: ubuntu-22.04
     timeout-minutes: 20
     env:
@@ -27,30 +34,13 @@ jobs:
           username: ${{ vars.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
 
-      - name: Build Docker Image
+      - name: Build Docker Image ${{ inputs.APP_NAME }}
+        working-directory: ${{ inputs.APP_NAME }}
         run: |
-          docker build -t ${{ vars.DOCKER_USERNAME }}/crawler-api:${{ env.IMAGE_TAG }} ./api
-          docker tag ${{ vars.DOCKER_USERNAME }}/crawler-api:${{ env.IMAGE_TAG }} ${{ vars.DOCKER_USERNAME }}/crawler-api:latest
+          docker build -t ${{ vars.DOCKER_USERNAME }}/${{ inputs.APP_NAME }}:${{ env.IMAGE_TAG }} .
+          docker tag ${{ vars.DOCKER_USERNAME }}/${{ inputs.APP_NAME }}:${{ env.IMAGE_TAG }} ${{ vars.DOCKER_USERNAME }}/${{ inputs.APP_NAME }}:latest
 
-          docker build -t ${{ vars.DOCKER_USERNAME }}/consumer-app:${{ env.IMAGE_TAG }} ./consumer
-          docker tag ${{ vars.DOCKER_USERNAME }}/consumer-app:${{ env.IMAGE_TAG }} ${{ vars.DOCKER_USERNAME }}/consumer-app:latest
-
-          docker build -t ${{ vars.DOCKER_USERNAME }}/crawler-app:${{ env.IMAGE_TAG }} ./crawler
-          docker tag ${{ vars.DOCKER_USERNAME }}/crawler-app:${{ env.IMAGE_TAG }} ${{ vars.DOCKER_USERNAME }}/crawler-app:latest
-
-          docker build -t ${{ vars.DOCKER_USERNAME }}/crawler-app-migrate:${{ env.IMAGE_TAG }} ./migrate
-          docker tag ${{ vars.DOCKER_USERNAME }}/crawler-app-migrate:${{ env.IMAGE_TAG }} ${{ vars.DOCKER_USERNAME }}/crawler-app-migrate:latest
-      
-      - name: Push Docker Image
+      - name: Push Docker Image ${{ inputs.APP_NAME }}
         run: |
-          docker push ${{ vars.DOCKER_USERNAME }}/crawler-api:latest
-          docker push ${{ vars.DOCKER_USERNAME }}/crawler-api:${{ env.IMAGE_TAG }}
-
-          docker push ${{ vars.DOCKER_USERNAME }}/consumer-app:latest
-          docker push ${{ vars.DOCKER_USERNAME }}/consumer-app:${{ env.IMAGE_TAG }}
-
-          docker push ${{ vars.DOCKER_USERNAME }}/crawler-app:latest
-          docker push ${{ vars.DOCKER_USERNAME }}/crawler-app:${{ env.IMAGE_TAG }}
-
-          docker push ${{ vars.DOCKER_USERNAME }}/crawler-app-migrate:latest
-          docker push ${{ vars.DOCKER_USERNAME }}/crawler-app-migrate:${{ env.IMAGE_TAG }}
+          docker push ${{ vars.DOCKER_USERNAME }}/${{ inputs.APP_NAME }}:latest
+          docker push ${{ vars.DOCKER_USERNAME }}/${{ inputs.APP_NAME }}:${{ env.IMAGE_TAG }}

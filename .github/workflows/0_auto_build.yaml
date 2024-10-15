@@ -1,0 +1,57 @@
+name: wf_be_build
+
+env:
+  PATH_SERVICES_BE: "crawler-api, consumer-app, crawler-app, crawler-app-migrate"
+
+on:
+  push:
+    branches: ["main"]
+    paths:
+      - "api/**"
+      - "consumer/**"
+      - "crawler/**"
+      - "migrate/**"
+
+jobs:
+  scan-changed-folders:
+    name: "1_Scan changed folders"
+    runs-on: ubuntu-22.04
+    timeout-minutes: 15
+    outputs:
+      be_triggering_path: ${{ steps.list_changed_files.outputs.be_triggering_path }}
+    permissions:
+      contents: read
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+      - name: Get changed files
+        id: changed-files
+        run: |
+          echo "all_changed_files=$(git diff --name-only HEAD HEAD~1 | xargs)"
+          echo "all_changed_files=$(git diff --name-only HEAD HEAD~1 | xargs)" >> $GITHUB_OUTPUT
+      - name: List all changed files
+        id: list_changed_files
+        run: |
+          chmod +x $GITHUB_WORKSPACE/.github/workflows/scripts/detect_trigger_path.sh
+          $GITHUB_WORKSPACE/.github/workflows/scripts/detect_trigger_path.sh
+        shell: bash
+        env:
+          PATH_SERVICES_BE: ${{ env.PATH_SERVICES_BE }}
+          ALL_CHANGED_FILES: ${{ steps.changed-files.outputs.all_changed_files }}
+
+  build-be:
+    name: "2_Build BE"
+    needs: ["scan-changed-folders"]
+    if: needs.scan-changed-folders.outputs.be_triggering_path != '[]'
+    strategy:
+      matrix:
+        apps: ${{ fromJSON(needs.scan-changed-folders.outputs.be_triggering_path) }}
+    uses: ./.github/workflows/wf_be_build.yml
+    with:
+      APP_NAME: ${{ matrix.apps }}
+      DOCKER_URL: ${{ vars.DOCKER_URL }}
+      DOCKER_USERNAME: ${{ vars.DOCKER_USERNAME }}
+    secrets:
+      DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
