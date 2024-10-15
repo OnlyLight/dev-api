@@ -48,7 +48,7 @@ jobs:
     strategy:
       matrix:
         apps: ${{ fromJSON(needs.scan-changed-folders.outputs.be_triggering_path) }}
-    uses: ./.github/workflows/wf_be_build.yml
+    uses: ./.github/workflows/1_wf_build.yaml
     with:
       APP_NAME: ${{ matrix.apps }}
       DOCKER_URL: ${{ vars.DOCKER_URL }}
