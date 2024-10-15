@@ -1,4 +1,4 @@
-name: wf_be_build
+name: 1_wf_be_build
 
 on:
   workflow_call:

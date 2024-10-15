@@ -1,4 +1,4 @@
-name: auto_build
+name: 0_auto_build
 
 env:
   PATH_SERVICES_BE: "crawler-api, consumer-app, crawler-app, crawler-app-migrate"
