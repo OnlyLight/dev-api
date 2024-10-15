@@ -8,7 +8,7 @@ use tracing_subscriber::{layer::SubscriberExt, util::SubscriberInitExt};
 use std::env;
 
 pub(crate) fn init_tracer() {
-    println!("OTLP_EXPORTER env: {}", &env::var("OTLP_EXPORTER"));
+    println!("OTLP_EXPORTER env: {}", env::var("OTLP_EXPORTER"));
     let otlp_exporter = opentelemetry_otlp::new_exporter()
         .tonic()
         .with_endpoint(&env::var("OTLP_EXPORTER").unwrap());
