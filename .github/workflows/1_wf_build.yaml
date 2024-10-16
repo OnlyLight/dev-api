@@ -15,12 +15,17 @@ on:
     secrets:
       DOCKER_PASSWORD:
         required: true
+    outputs:
+      IMAGE_TAG:
+        value: ${{ jobs.build.outputs.IMAGE_TAG }}
 
 jobs:
   build:
     name: Build ${{ inputs.APP_NAME }}
     runs-on: ubuntu-22.04
     timeout-minutes: 20
+    outputs:
+      IMAGE_TAG: ${{ steps.out_tag.outputs.IMAGE_TAG }}
     env:
       IMAGE_TAG: $(git rev-parse --short HEAD)
     steps:
@@ -44,3 +49,9 @@ jobs:
         run: |
           docker push ${{ vars.DOCKER_USERNAME }}/${{ inputs.APP_NAME }}:latest
           docker push ${{ vars.DOCKER_USERNAME }}/${{ inputs.APP_NAME }}:${{ env.IMAGE_TAG }}
+      
+      - name: Output IMAGE_TAG for Deployment steps
+        id: out_tag
+        run: |
+          echo "IMAGE_TAG=${{ env.IMAGE_TAG }}" >> $GITHUB_OUTPUT
+          echo "IMAGE_TAG=${{ env.IMAGE_TAG }}"

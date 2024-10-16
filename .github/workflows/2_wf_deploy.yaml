@@ -1,0 +1,77 @@
+name: wf_deploy
+
+on:
+  workflow_call:
+    inputs:
+      APP_NAME:
+        required: true
+        type: string
+      IMAGE_TAG:
+        required: true
+        type: string
+      DOCKER_URL:
+        required: true
+        type: string
+      DOCKER_USERNAME:
+        required: true
+        type: string
+    secrets:
+      DOCKER_PASSWORD:
+        required: true
+jobs:
+  deploy:
+    name: Deploy_${{ inputs.APP_NAME }}
+    runs-on: ubuntu-22.04
+    timeout-minutes: 20
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v4
+
+      - name: Checkout infra repository
+        uses: actions/checkout@v4
+        with:
+          repository: duytran2782/devguild-infra
+          ref: main
+
+      - name: Update image tag helm chart
+        working-directory: helm
+        run: |
+          oldValue="tag:.*"
+          newValue="tag: ${{ inputs.IMAGE_TAG }}"
+          
+          case ${{ inputs.APP_NAME }} in
+            "crawler-api")
+              cd app/api/
+              ;;
+
+            "consumer-app")
+              cd scrape_data/consumer/
+              ;;
+
+            "crawler-app")
+              cd scrape_data/migrate-init/
+              ;;
+
+            "crawler-app-migrate")
+              cd scrape_data/migrate/
+              ;;
+          esac
+
+          ls -al
+          sed -i "s/$oldValue/$newValue/" ./values.yaml
+          
+          # git config user.email "CI@gmail.com"
+          # git config user.name "CI"
+          
+          # git add .
+          # git commit -m "Update image to ${{ inputs.APP_NAME }} with tag ${{ inputs.IMAGE_TAG }}" || true
+          # git push origin main || true
+
+      # - name: Deploy to AKS
+      #   run: |
+      #     COMMAND=$(helm ls | grep "${{ inputs.ENV_NAME }}-kpmgblue");
+      #     if [ -z "$COMMAND" ]; then
+      #       helm install ${{ inputs.ENV_NAME }}-kpmgblue blue-${{ inputs.ENV_NAME }}/ --values blue-${{ inputs.ENV_NAME }}/values_${{ inputs.ENV_NAME }}.yaml -n ${{ inputs.ENV_NAME }}
+      #     else
+      #       helm upgrade ${{ inputs.ENV_NAME }}-kpmgblue blue-${{ inputs.ENV_NAME }}/ --values blue-${{ inputs.ENV_NAME }}/values_${{ inputs.ENV_NAME }}.yaml -n ${{ inputs.ENV_NAME }}
+      #     fi
