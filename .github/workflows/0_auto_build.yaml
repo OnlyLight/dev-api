@@ -58,7 +58,7 @@ jobs:
 
   deploy-be:
     name: "3_Deploy BE"
-    needs: ["scan-changed-folders"]
+    needs: ["scan-changed-folders", "build-be"]
     if: needs.scan-changed-folders.outputs.be_triggering_path != '[]'
     strategy:
       matrix:
