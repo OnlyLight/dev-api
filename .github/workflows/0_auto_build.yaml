@@ -71,3 +71,4 @@ jobs:
       DOCKER_USERNAME: ${{ vars.DOCKER_USERNAME }}
     secrets:
       DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+      PERSONAL_TOKEN: ${{ secrets.PERSONAL_TOKEN }}
