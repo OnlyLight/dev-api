@@ -32,6 +32,7 @@ jobs:
         with:
           repository: duytran2782/devguild-infra
           ref: main
+          token: ${{ secrets.PERSONAL_TOKEN }}
 
       - name: Update image tag helm chart
         working-directory: helm
