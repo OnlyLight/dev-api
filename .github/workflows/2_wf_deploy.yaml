@@ -70,11 +70,3 @@ jobs:
           git add .
           git commit -m "Update image to ${{ inputs.APP_NAME }} with tag ${{ inputs.IMAGE_TAG }}" || true
           git push origin main || true
-
-          # # Deploy to K8S
-          # COMMAND=$(helm ls | grep "${{ inputs.APP_NAME }}-devguild");
-          # if [ -z "$COMMAND" ]; then
-          #   helm install ${{ inputs.APP_NAME }}-devguild ./ --values ./values.yaml
-          # else
-          #   helm upgrade ${{ inputs.APP_NAME }}-devguild ./ --values ./values.yaml
-          # fi
