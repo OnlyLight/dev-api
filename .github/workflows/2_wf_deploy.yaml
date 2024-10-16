@@ -58,14 +58,15 @@ jobs:
           esac
 
           ls -al
+          echo $(pwd)
           sed -i "s/$oldValue/$newValue/" ./values.yaml
           
-          # git config user.email "CI@gmail.com"
-          # git config user.name "CI"
+          git config user.email "CI@gmail.com"
+          git config user.name "CI"
           
-          # git add .
-          # git commit -m "Update image to ${{ inputs.APP_NAME }} with tag ${{ inputs.IMAGE_TAG }}" || true
-          # git push origin main || true
+          git add .
+          git commit -m "Update image to ${{ inputs.APP_NAME }} with tag ${{ inputs.IMAGE_TAG }}" || true
+          git push origin main || true
 
       # - name: Deploy to AKS
       #   run: |
