@@ -44,19 +44,19 @@ jobs:
           
           case ${{ inputs.APP_NAME }} in
             "crawler-api")
-              cd app/api/
+              cd application/app/api/
               ;;
 
             "consumer-app")
-              cd scrape_data/consumer/
+              cd application/scrape_data/consumer/
               ;;
 
             "crawler-app")
-              cd scrape_data/migrate-init/
+              cd application/scrape_data/migrate-init/
               ;;
 
             "crawler-app-migrate")
-              cd scrape_data/migrate/
+              cd application/scrape_data/migrate/
               ;;
           esac
 
