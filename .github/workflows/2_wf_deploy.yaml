@@ -32,16 +32,42 @@ jobs:
       - name: Checkout infra repository
         uses: actions/checkout@v4
         with:
-          repository: duytran2782/devguild-infra
+          repository: OnlyLight/dev-infra
           ref: main
           token: ${{ secrets.PERSONAL_TOKEN }}
 
-      - name: Update image tag helm chart
+      - name: Determine Blue-Green Environment
         working-directory: helm
         run: |
-          oldValue="tag:.*"
-          newValue="tag: ${{ inputs.IMAGE_TAG }}"
-          
+          case ${{ inputs.APP_NAME }} in
+            "crawler-api")
+              cd application/app/api/
+              ;;
+
+            "consumer-app")
+              cd application/scrape_data/consumer/
+              ;;
+
+            "crawler-app")
+              cd application/scrape_data/migrate-init/
+              ;;
+
+            "crawler-app-migrate")
+              cd application/scrape_data/migrate/
+              ;;
+          esac
+
+          CURRENT_ENV=$(yq e '.environment.active' ./values.yaml)
+          if [ "$CURRENT_ENV" = "blue" ]; then
+            NEW_ENV="green"
+          else
+            NEW_ENV="blue"
+          fi
+          echo "new_env=${NEW_ENV}" >> $GITHUB_ENV
+
+      - name: Update Helm Values for New Environment
+        working-directory: helm
+        run: |
           case ${{ inputs.APP_NAME }} in
             "crawler-api")
               cd application/app/api/
@@ -62,11 +88,14 @@ jobs:
 
           ls -al
           echo $(pwd)
-          sed -i "s/$oldValue/$newValue/" ./values.yaml
+          yq e -i ".environment.active = \"${{ env.new_env }}\"" ./values.yaml
+          yq e -i ".image.tag = \"${{ inputs.IMAGE_TAG }}\"" ./values-${{ env.new_env }}.yaml
           
+      - name: Commit and Push Changes
+        run: |
           git config user.email "CI@gmail.com"
           git config user.name "CI"
           
           git add .
-          git commit -m "Update image to ${{ inputs.APP_NAME }} with tag ${{ inputs.IMAGE_TAG }}" || true
+          git commit -m "Update image to ${{ inputs.APP_NAME }} with tag ${{ inputs.IMAGE_TAG }} on environment ${{ env.new_env }}" || true
           git push origin main || true
