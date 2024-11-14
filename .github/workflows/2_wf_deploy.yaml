@@ -63,34 +63,13 @@ jobs:
           else
             NEW_ENV="blue"
           fi
+          echo "new_env=${NEW_ENV}"
           echo "new_env=${NEW_ENV}" >> $GITHUB_ENV
 
-      - name: Update Helm Values for New Environment
-        working-directory: helm
-        run: |
-          case ${{ inputs.APP_NAME }} in
-            "crawler-api")
-              cd application/app/api/
-              ;;
-
-            "consumer-app")
-              cd application/scrape_data/consumer/
-              ;;
-
-            "crawler-app")
-              cd application/scrape_data/migrate-init/
-              ;;
-
-            "crawler-app-migrate")
-              cd application/scrape_data/migrate/
-              ;;
-          esac
-
-          ls -al
-          echo $(pwd)
+          # Update Helm Values for new env
           yq e -i ".environment.active = \"${{ env.new_env }}\"" ./values.yaml
-          yq e -i ".image.tag = \"${{ inputs.IMAGE_TAG }}\"" ./values-${{ env.new_env }}.yaml
-          
+          yq e -i ".image.tag = \"${{ inputs.IMAGE_TAG }}\"" ./values.yaml
+
       - name: Commit and Push Changes
         run: |
           git config user.email "CI@gmail.com"
