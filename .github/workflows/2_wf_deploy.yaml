@@ -70,11 +70,11 @@ jobs:
           yq e -i ".environment.active = \"${{ env.new_env }}\"" ./values.yaml
           yq e -i ".image.tag = \"${{ inputs.IMAGE_TAG }}\"" ./values.yaml
 
-      - name: Commit and Push Changes
-        run: |
-          git config user.email "CI@gmail.com"
-          git config user.name "CI"
+      # - name: Commit and Push Changes
+      #   run: |
+      #     git config user.email "CI@gmail.com"
+      #     git config user.name "CI"
           
-          git add .
-          git commit -m "Update image to ${{ inputs.APP_NAME }} with tag ${{ inputs.IMAGE_TAG }} on environment ${{ env.new_env }}" || true
-          git push origin main || true
+      #     git add .
+      #     git commit -m "Update image to ${{ inputs.APP_NAME }} with tag ${{ inputs.IMAGE_TAG }} on environment ${{ env.new_env }}" || true
+      #     git push origin main || true
