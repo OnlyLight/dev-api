@@ -56,19 +56,19 @@ jobs:
     secrets:
       DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
 
-  deploy-be:
-    name: "3_Deploy BE"
-    needs: ["scan-changed-folders", "build-be"]
-    if: needs.scan-changed-folders.outputs.be_triggering_path != '[]'
-    strategy:
-      matrix:
-        apps: ${{ fromJSON(needs.scan-changed-folders.outputs.be_triggering_path) }}
-    uses: ./.github/workflows/2_wf_deploy.yaml
-    with:
-      APP_NAME: ${{ matrix.apps }}
-      IMAGE_TAG: ${{ needs.build-be.outputs.IMAGE_TAG }}
-      DOCKER_URL: ${{ vars.DOCKER_URL }}
-      DOCKER_USERNAME: ${{ vars.DOCKER_USERNAME }}
-    secrets:
-      DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
-      PERSONAL_TOKEN: ${{ secrets.PERSONAL_TOKEN }}
+  # deploy-be:
+  #   name: "3_Deploy BE"
+  #   needs: ["scan-changed-folders", "build-be"]
+  #   if: needs.scan-changed-folders.outputs.be_triggering_path != '[]'
+  #   strategy:
+  #     matrix:
+  #       apps: ${{ fromJSON(needs.scan-changed-folders.outputs.be_triggering_path) }}
+  #   uses: ./.github/workflows/2_wf_deploy.yaml
+  #   with:
+  #     APP_NAME: ${{ matrix.apps }}
+  #     IMAGE_TAG: ${{ needs.build-be.outputs.IMAGE_TAG }}
+  #     DOCKER_URL: ${{ vars.DOCKER_URL }}
+  #     DOCKER_USERNAME: ${{ vars.DOCKER_USERNAME }}
+  #   secrets:
+  #     DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
+  #     PERSONAL_TOKEN: ${{ secrets.PERSONAL_TOKEN }}
